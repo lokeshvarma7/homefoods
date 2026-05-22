@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeFoods | Healthy Cloud Kitchen</title>
+    <meta name="description" content="HomeFoods is a healthy cloud kitchen in Kurnool offering wholesome breakfast options.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader" class="preloader">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <h1>Preparing Wholesome Food...</h1>
+            <p id="loading-percentage">0%</p>
+        </div>
+    </div>
+
+    <!-- Pinned Canvas Wrapper -->
+    <div class="canvas-container">
+        <canvas id="hero-canvas"></canvas>
+    </div>
+
+    <!-- Scroll Content Overlay -->
+    <div class="scroll-content">
+        <!-- Intro Hero Screen -->
+        <section class="hero-section" id="hero-section">
+            <div class="hero-content">
+                <h1 class="trendy-welcome">
+                    <span class="welcome-text">Welcome to</span>
+                    <span class="brand-title">HomeFoods</span>
+                </h1>
+            </div>
+        </section>
+
+        <!-- Sequence 1: Chapathi -->
+        <section class="panel" id="panel-1">
+            <div class="card glass">
+                <h2>Flax Chapathi (2pcs) — ₹59</h2>
+                <p>Wholesome, fiber-rich, and heart-healthy.</p>
+                <div class="health-benefits">
+                    <ul>
+                        <li>Rich in Omega-3 Fatty Acids</li>
+                        <li>High Dietary Fiber</li>
+                        <li>Supports Heart Health</li>
+                        <li>Low Glycemic Index</li>
+                    </ul>
+                </div>
+                <a href="https://www.swiggy.com/city/kurnool/homefoods-sampath-nagar-rest1341956" target="_blank" class="cta-button" rel="noopener noreferrer">Order Now on Swiggy</a>
+            </div>
+        </section>
+
+        <!-- Sequence 2: Idly -->
+        <section class="panel" id="panel-2">
+            <div class="card glass">
+                <h2>Soft Idly (4pcs) — ₹49</h2>
+                <p>Pillowy soft, steam-fresh breakfast perfection.</p>
+                <a href="https://www.swiggy.com/city/kurnool/homefoods-sampath-nagar-rest1341956" target="_blank" class="cta-button" rel="noopener noreferrer">Order Now on Swiggy</a>
+            </div>
+        </section>
+
+        <!-- Sequence 3: Dosa -->
+        <section class="panel" id="panel-3">
+            <div class="card glass">
+                <h2>Crispy Dosa — ₹49</h2>
+                <p>Perfectly golden, traditional, and delightfully crispy.</p>
+                <a href="https://www.swiggy.com/city/kurnool/homefoods-sampath-nagar-rest1341956" target="_blank" class="cta-button" rel="noopener noreferrer">Order Now on Swiggy</a>
+            </div>
+        </section>
+
+        <!-- Sequence 4: Oats Smoothie -->
+        <section class="panel" id="panel-4">
+            <div class="card glass">
+                <h2>Oats Smoothie — ₹49</h2>
+                <p>Creamy blend of whole oats and natural energy, with zero preservatives.</p>
+                <div class="health-benefits">
+                    <ul>
+                        <li>Zero Preservatives</li>
+                        <li>Natural Energy Booster</li>
+                        <li>Rich in Antioxidants</li>
+                        <li>Perfect Post-Workout Recovery</li>
+                    </ul>
+                </div>
+                <a href="https://www.swiggy.com/city/kurnool/homefoods-sampath-nagar-rest1341956" target="_blank" class="cta-button" rel="noopener noreferrer">Order Now on Swiggy</a>
+            </div>
+        </section>
+
+        <!-- Sequence 5: Combo Finale Overlay -->
+        <section class="panel finale-panel" id="panel-5">
+            <div class="card glass combo-card">
+                <div class="combo-badge">⭐ Start Smart Combo Offer ⭐</div>
+                <h2>Can't decide? Get the complete healthy spread for breakfast!</h2>
+                <h3 class="price-highlight">Just ₹119 Only!</h3>
+                <a href="https://www.swiggy.com/city/kurnool/homefoods-sampath-nagar-rest1341956" target="_blank" class="cta-button giant-cta" rel="noopener noreferrer">Order Combo on Swiggy</a>
+                <p class="location-tag">Currently serving in Kurnool on Swiggy</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>

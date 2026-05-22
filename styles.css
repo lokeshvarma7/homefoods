@@ -1,0 +1,439 @@
+:root {
+    --primary-color: #2b1d1b;
+    --primary-light: #44302e;
+    --text-light: #fdfbf7;
+    --glass-bg: rgba(30, 20, 18, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --highlight: #f7d6c8;
+    --accent: #ffd166;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background: linear-gradient(-45deg, #0e0a09, #251614, #1b0e0c, #351c19);
+    background-size: 400% 400%;
+    animation: gradientMesh 15s ease infinite;
+    color: var(--text-light);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+@keyframes gradientMesh {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Preloader */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0e0a09;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s ease-out, visibility 0.8s;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    border: 3px solid transparent;
+    border-top: 3px solid var(--highlight);
+    border-right: 3px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+    margin: 0 auto 25px;
+    filter: drop-shadow(0 0 10px rgba(247, 214, 200, 0.4));
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.preloader h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    background: linear-gradient(90deg, #f7d6c8, #ffd166, #f7d6c8);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+    animation: preloaderShimmer 2.5s linear infinite, preloaderPulse 1.8s ease-in-out infinite;
+}
+
+#loading-percentage {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-light);
+    letter-spacing: -1px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    animation: preloaderBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes preloaderShimmer {
+    to { background-position: 200% center; }
+}
+
+@keyframes preloaderPulse {
+    0%, 100% {
+        transform: scale(0.97);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.03);
+        opacity: 1;
+    }
+}
+
+@keyframes preloaderBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* Canvas Container */
+.canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none; /* Let clicks pass through to panels */
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Scroll Overlay Content */
+.scroll-content {
+    position: relative;
+    z-index: 10;
+}
+
+.panel {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 10%;
+    opacity: 0; /* Hidden by default, animated by GSAP */
+}
+
+/* Alternate alignment */
+.panel:nth-child(odd) {
+    justify-content: flex-start;
+}
+
+.panel:nth-child(even) {
+    justify-content: flex-end;
+}
+
+.finale-panel {
+    justify-content: center !important;
+}
+
+/* Text Panel Wrapper (No Box Needed) */
+.glass {
+    padding: 20px;
+    max-width: 500px;
+    /* Heavy text shadow to ensure readability against any background */
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 0 2px 5px rgba(0,0,0,0.6);
+    transform: translateY(30px);
+    transition: transform 0.4s ease;
+}
+
+.panel.active .glass {
+    transform: translateY(0);
+}
+
+.card h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    line-height: 1.1;
+    color: #fff;
+}
+
+.card p {
+    font-size: 1.1rem;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    color: #e9ecef;
+}
+
+/* Health Benefits List */
+.health-benefits {
+    margin-bottom: 30px;
+}
+
+.health-benefits ul {
+    list-style: none;
+}
+
+.health-benefits li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--highlight);
+}
+
+.health-benefits li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+/* Buttons */
+.cta-button {
+    display: inline-block;
+    background-color: var(--text-light);
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 16px 32px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+    background-color: #fff;
+}
+
+/* Finale & Hero Specifics */
+.hero-section {
+    position: fixed; /* So it stays in the center before scrolling */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: flex-start; /* Position at the top */
+    justify-content: center;
+    padding-top: 8vh; /* 8% viewport height from the top for top-middle positioning */
+    z-index: 15; /* Above canvas, below panels when scrolling */
+    pointer-events: none;
+}
+
+.hero-content {
+    text-align: center;
+    perspective: 1000px;
+}
+
+.trendy-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.welcome-text {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: #e9ecef;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.brand-title {
+    font-size: 5rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #f7d6c8, #ffd166);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0;
+    transform: translateY(30px) rotateX(-20deg);
+    transform-origin: center bottom;
+    animation: elegantPop 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.3s forwards;
+}
+
+@keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes elegantPop {
+    to { opacity: 1; transform: translateY(0) rotateX(0deg); }
+}
+
+.combo-card {
+    text-align: center;
+    max-width: 600px;
+    /* Finale can keep a slight dark background to emphasize the offer */
+    background: rgba(30, 20, 18, 0.85);
+    border: 1px solid rgba(255, 209, 102, 0.3);
+    border-radius: 24px;
+    padding: 40px;
+}
+
+.combo-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.price-highlight {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 30px;
+}
+
+.giant-cta {
+    font-size: 1.3rem;
+    padding: 20px 40px;
+    background-color: var(--accent);
+    color: #000;
+}
+
+.giant-cta:hover {
+    background-color: #fff;
+    box-shadow: 0 8px 30px rgba(255, 209, 102, 0.4);
+}
+
+.location-tag {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--highlight);
+    margin-top: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.95;
+    animation: locationPulse 2s ease-in-out infinite;
+}
+
+@keyframes locationPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .panel {
+        padding: 0 5%;
+        align-items: flex-end; /* Push text to bottom on mobile so it doesn't overlay the main food image */
+        padding-bottom: 8vh;
+    }
+    
+    .panel:nth-child(odd), .panel:nth-child(even) {
+        justify-content: center;
+    }
+
+    .glass {
+        padding: 20px 10px;
+        width: 100%;
+        text-align: center; /* Center aligning text on mobile for better balance */
+    }
+
+    .card h2 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .card p {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    .health-benefits {
+        margin-bottom: 16px;
+        display: inline-block; /* Allows lists to center nicely inside centered text align */
+        text-align: left; /* Keeps checklist markers aligned beautifully */
+    }
+
+    .health-benefits li {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+
+    .cta-button {
+        display: block;
+        padding: 12px 24px;
+        font-size: 1rem;
+        width: 100%; /* Easy to tap full-width button on mobile */
+        text-align: center;
+    }
+
+    /* Combo Card Mobile Polishing */
+    .combo-card {
+        padding: 24px 16px;
+        border-radius: 20px;
+        width: 100%;
+    }
+
+    .combo-badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        margin-bottom: 12px;
+    }
+
+    .price-highlight {
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+    }
+
+    .giant-cta {
+        font-size: 1.1rem;
+        padding: 14px 28px;
+    }
+    
+    canvas {
+        object-position: center 38%; /* Shift food image upwards on mobile so it sits cleanly above bottom text overlays */
+    }
+
+    /* Hero Section Intro scaling for mobile */
+    .hero-section {
+        padding-top: 12vh; /* Slightly lower from screen top on mobile to clear headers */
+    }
+
+    .welcome-text {
+        font-size: 1.1rem;
+        letter-spacing: 6px;
+    }
+
+    .brand-title {
+        font-size: 2.8rem; /* Avoid text-wrapping / overflowing on narrow mobile devices */
+    }
+}

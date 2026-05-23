@@ -46,16 +46,20 @@ document.addEventListener("DOMContentLoaded", () => {
     function resizeCanvas() {
         const dpr = window.devicePixelRatio || 1;
         
-        // Upscale canvas drawing buffer to match physical device pixels
-        // This delivers pin-sharp native-resolution rendering instead of blurry upscale interpolation!
-        canvas.width = Math.round(window.innerWidth * dpr);
-        canvas.height = Math.round(window.innerHeight * dpr);
+        // Upscale canvas drawing buffer using exact CSS layout client dimensions
+        // This delivers pin-sharp native-resolution rendering and prevents scrollbar/address bar stretching!
+        const width = canvas.clientWidth || window.innerWidth;
+        const height = canvas.clientHeight || window.innerHeight;
+        
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
 
         // Instantly force redraw the current active frame at the high-DPI resolution
         if (isAnimationInitialized && lastRenderedFrame !== -1) {
             renderFrame(lastRenderedFrame, true);
         }
     }
+
 
     // Initialize high-DPI sizing and listen for resize events
     resizeCanvas();
@@ -225,58 +229,27 @@ document.addEventListener("DOMContentLoaded", () => {
         if (img) {
             context.clearRect(0, 0, canvas.width, canvas.height);
             
-            const isPortrait = canvas.width < canvas.height;
             const canvasRatio = canvas.width / canvas.height;
             const imgRatio = img.width / img.height;
+            let drawWidth = canvas.width;
+            let drawHeight = canvas.height;
 
-            if (isPortrait) {
-                // --- Mobile Portrait: Ambient Glow & Sharp Centered Showcase ---
-                // 1. Draw the blurred, darkened ambient background to cover 100% of the tall viewport
-                context.save();
-                if (context.filter !== undefined) {
-                    context.filter = "blur(40px) brightness(0.35) saturate(140%)";
-                }
-                
-                let bgWidth = canvas.height * imgRatio;
-                let bgHeight = canvas.height;
-                let bgOffsetX = Math.round((canvas.width - bgWidth) / 2);
-                let bgOffsetY = 0;
-                
-                context.drawImage(img, bgOffsetX, bgOffsetY, Math.round(bgWidth), Math.round(bgHeight));
-                context.restore();
-
-                // 2. Draw the sharp, beautifully balanced foreground centered in the viewport
-                // Scaled to 1.4x of the width for an immersive close-up that fits mobile perfectly
-                let fgWidth = canvas.width * 1.4;
-                let fgHeight = fgWidth / imgRatio;
-                
-                let fgOffsetX = Math.round((canvas.width - fgWidth) / 2);
-                // Offset upward by 5% of screen height to leave gorgeous, clean breathing room for bottom text cards!
-                let fgOffsetY = Math.round((canvas.height - fgHeight) / 2) - Math.round(canvas.height * 0.05);
-                
-                context.drawImage(img, fgOffsetX, fgOffsetY, Math.round(fgWidth), Math.round(fgHeight));
+            // Proportional Fullscreen Cover (fits the screen perfectly, never stretches, and minimizes cropping!)
+            if (imgRatio > canvasRatio) {
+                drawWidth = canvas.height * imgRatio;
+                drawHeight = canvas.height;
             } else {
-                // --- Desktop Landscape: Clean Fullscreen Cinematic Crop ---
-                let drawWidth = canvas.width;
-                let drawHeight = canvas.height;
-
-                if (imgRatio > canvasRatio) {
-                    drawWidth = canvas.height * imgRatio;
-                } else {
-                    drawHeight = canvas.width / imgRatio;
-                }
-
-                const zoomScale = 1.15; // 15% cinematic crop to cover edges/watermarks
-                drawWidth *= zoomScale;
-                drawHeight *= zoomScale;
-
-                const offsetX = Math.round((canvas.width - drawWidth) / 2);
-                const offsetY = Math.round((canvas.height - drawHeight) / 2);
-                const finalWidth = Math.round(drawWidth);
-                const finalHeight = Math.round(drawHeight);
-
-                context.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / imgRatio;
             }
+
+            // Exact integer coordinates to prevent browser sub-pixel anti-aliasing shimmering
+            const offsetX = Math.round((canvas.width - drawWidth) / 2);
+            const offsetY = Math.round((canvas.height - drawHeight) / 2);
+            const finalWidth = Math.round(drawWidth);
+            const finalHeight = Math.round(drawHeight);
+
+            context.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
         }
     }
 

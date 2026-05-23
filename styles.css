@@ -50,6 +50,22 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
+.logo-link, .status-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+    display: inline-block;
+}
+
+.logo-link:hover, .status-link:hover {
+    transform: translateY(-2px) scale(1.03);
+    opacity: 0.95;
+}
+
+.logo-link:active, .status-link:active {
+    transform: translateY(0) scale(0.98);
+}
+
 .logo {
     display: flex;
     align-items: center;

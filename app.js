@@ -225,29 +225,58 @@ document.addEventListener("DOMContentLoaded", () => {
         if (img) {
             context.clearRect(0, 0, canvas.width, canvas.height);
             
+            const isPortrait = canvas.width < canvas.height;
             const canvasRatio = canvas.width / canvas.height;
             const imgRatio = img.width / img.height;
-            let drawWidth = canvas.width;
-            let drawHeight = canvas.height;
 
-            if (imgRatio > canvasRatio) {
-                drawWidth = canvas.height * imgRatio;
+            if (isPortrait) {
+                // --- Mobile Portrait: Ambient Glow & Sharp Centered Showcase ---
+                // 1. Draw the blurred, darkened ambient background to cover 100% of the tall viewport
+                context.save();
+                if (context.filter !== undefined) {
+                    context.filter = "blur(40px) brightness(0.35) saturate(140%)";
+                }
+                
+                let bgWidth = canvas.height * imgRatio;
+                let bgHeight = canvas.height;
+                let bgOffsetX = Math.round((canvas.width - bgWidth) / 2);
+                let bgOffsetY = 0;
+                
+                context.drawImage(img, bgOffsetX, bgOffsetY, Math.round(bgWidth), Math.round(bgHeight));
+                context.restore();
+
+                // 2. Draw the sharp, fully zoomed-out foreground centered in the viewport
+                // Fitted to mobile screen width with a tiny premium border safety margin
+                let fgWidth = canvas.width * 1.05;
+                let fgHeight = fgWidth / imgRatio;
+                
+                let fgOffsetX = Math.round((canvas.width - fgWidth) / 2);
+                // Offset upward by 5% of screen height to leave gorgeous, clean breathing room for bottom text cards!
+                let fgOffsetY = Math.round((canvas.height - fgHeight) / 2) - Math.round(canvas.height * 0.05);
+                
+                context.drawImage(img, fgOffsetX, fgOffsetY, Math.round(fgWidth), Math.round(fgHeight));
             } else {
-                drawHeight = canvas.width / imgRatio;
+                // --- Desktop Landscape: Clean Fullscreen Cinematic Crop ---
+                let drawWidth = canvas.width;
+                let drawHeight = canvas.height;
+
+                if (imgRatio > canvasRatio) {
+                    drawWidth = canvas.height * imgRatio;
+                } else {
+                    drawHeight = canvas.width / imgRatio;
+                }
+
+                const zoomScale = 1.15; // 15% cinematic crop to cover edges/watermarks
+                drawWidth *= zoomScale;
+                drawHeight *= zoomScale;
+
+                const offsetX = Math.round((canvas.width - drawWidth) / 2);
+                const offsetY = Math.round((canvas.height - drawHeight) / 2);
+                const finalWidth = Math.round(drawWidth);
+                const finalHeight = Math.round(drawHeight);
+
+                context.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
             }
-
-            // Cinematic Zoom Scale to crop out bottom watermarks (e.g. 15% zoom)
-            const zoomScale = 1.15;
-            drawWidth *= zoomScale;
-            drawHeight *= zoomScale;
-
-            // Center the cropped image with exact integer alignment to prevent sub-pixel shimmering
-            const offsetX = Math.round((canvas.width - drawWidth) / 2);
-            const offsetY = Math.round((canvas.height - drawHeight) / 2);
-            const finalWidth = Math.round(drawWidth);
-            const finalHeight = Math.round(drawHeight);
-
-            context.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
         }
     }
 

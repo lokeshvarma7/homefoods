@@ -251,37 +251,81 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- 4. Slideshow Controller Setup ---
+    // --- 4. Slideshow Controller Setup & Cinematic Showcase Engine ---
     let currentSlide = 0;
     let isTransitioning = false;
     let autoplayTimer = null;
-    const AUTOPLAY_DELAY = 2.0; // Snappy 2.0 seconds reading pause for fast-paced commercial flow!
+    let showcaseTween = null;
     const playhead = { frame: 0 };
 
-    // Define slide states and dynamic target frames
+    // Define slide states, elements, and their fast-transition target frames (the start of beauty showcase)
     const slides = [
-        { id: 'hero-section', frame: 0, el: document.querySelector('.hero-section') },
-        { id: 'panel-1', frame: seqLen - 1, el: document.getElementById('panel-1') },
-        { id: 'panel-2', frame: (seqLen * 2) - 1, el: document.getElementById('panel-2') },
-        { id: 'panel-3', frame: (seqLen * 3) - 1, el: document.getElementById('panel-3') },
-        { id: 'panel-4', frame: (seqLen * 4) - 1, el: document.getElementById('panel-4') },
-        { id: 'panel-5', frame: (seqLen * 4) - 1, el: document.getElementById('panel-5') }
+        { id: 'hero-section', frame: 0, el: document.querySelector('.hero-section'), seqIdx: -1 },
+        { id: 'panel-1', frame: 30, el: document.getElementById('panel-1'), seqIdx: 0 },
+        { id: 'panel-2', frame: seqLen + 30, el: document.getElementById('panel-2'), seqIdx: 1 },
+        { id: 'panel-3', frame: (seqLen * 2) + 30, el: document.getElementById('panel-3'), seqIdx: 2 },
+        { id: 'panel-4', frame: (seqLen * 3) + 30, el: document.getElementById('panel-4'), seqIdx: 3 },
+        { id: 'panel-5', frame: (seqLen * 3) + 30, el: document.getElementById('panel-5'), seqIdx: 3 }
     ];
 
     const dots = document.querySelectorAll('.nav-dot');
+
+    // Controls the slow, beautiful, cinematic close-up beauty shot when active on a slide card
+    function playSlideShowcase(index, manual) {
+        if (showcaseTween) {
+            showcaseTween.kill();
+            showcaseTween = null;
+        }
+        stopAutoplay(); // Clear fallback autoplay timers
+
+        const slide = slides[index];
+        if (slide.seqIdx === -1) {
+            // Hero Landing Section: hold for 3.0 seconds, then transition to Slide 1
+            autoplayTimer = setTimeout(() => {
+                goToSlide(1);
+            }, 3000);
+            return;
+        }
+
+        const startFrame = slide.seqIdx * seqLen + 30;
+        const endFrame = (slide.seqIdx + 1) * seqLen - 1;
+
+        // Ensure we are locked exactly at the beauty shot start frame
+        playhead.frame = startFrame;
+
+        // Slow, premium, linear cinematic beauty pan (takes 4.5 seconds for commercial-grade speed)
+        showcaseTween = gsap.to(playhead, {
+            frame: endFrame,
+            duration: 4.5,
+            ease: "none", // Linear ease for solid fluid video-like playback
+            onUpdate: () => {
+                renderFrame(Math.round(playhead.frame));
+            },
+            onComplete: () => {
+                // "transition smoothly to the other items quickly after animation"
+                // Once the cinematic beauty shot completes, transition immediately to the next slide!
+                let nextIndex = (index + 1) % slides.length;
+                goToSlide(nextIndex);
+            }
+        });
+    }
 
     function goToSlide(index, manual = false) {
         if (index === currentSlide && isTransitioning) return; // Prevent transition collisions
         if (index === currentSlide && manual) return;
         
         isTransitioning = true;
-        stopAutoplay(); // Clear active autoplay timer immediately on transition start
+        stopAutoplay();
+        if (showcaseTween) {
+            showcaseTween.kill();
+            showcaseTween = null;
+        }
 
         const currentSlideObj = slides[currentSlide];
         const nextSlideObj = slides[index];
 
-        // Kinetic transition sweep durations: 0.8s for autoplay, 0.6s for fast manual response!
-        const tweenDuration = manual ? 0.6 : 0.8;
+        // Transitions (sweeps) are extremely fast and dynamic (0.5s autoplay, 0.4s manual clicks/swipes)
+        const tweenDuration = manual ? 0.4 : 0.5;
 
         // Create unified GSAP timeline for gorgeous synchronized, overlapping card transitions
         gsap.killTweensOf(playhead);
@@ -294,17 +338,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentSlide = index;
                 isTransitioning = false;
 
-                // Always resume autoplay dynamically! Manual interactions hold for 3.5s, autoplay for 2.0s.
-                startAutoplay(manual ? 3.5 : AUTOPLAY_DELAY);
+                // Start the slow cinematic beauty showcase shot on the new slide!
+                playSlideShowcase(index, manual);
             }
         });
-
 
         // 1. Instantly fade out the current active card elements
         if (currentSlideObj.id === 'hero-section') {
             tl.to(currentSlideObj.el, { 
                 opacity: 0, 
-                duration: 0.2, 
+                duration: 0.15, 
                 ease: "power2.inOut",
                 onComplete: () => {
                     currentSlideObj.el.style.pointerEvents = 'none';
@@ -316,25 +359,25 @@ document.addEventListener("DOMContentLoaded", () => {
             if (currentCard) {
                 tl.to(currentCard, { 
                     opacity: 0, 
-                    y: -20, 
-                    duration: 0.2, 
+                    y: -15, 
+                    duration: 0.15, 
                     ease: "power2.in" 
                 });
             }
             tl.to(currentSlideObj.el, { 
                 opacity: 0, 
-                duration: 0.2,
+                duration: 0.15,
                 onComplete: () => {
                     currentSlideObj.el.classList.remove('active');
                 }
             }, "<");
         }
 
-        // 2. Play background camera frame sweep with dramatic decelerating ease
+        // 2. Play background camera frame sweep with extremely fast, energetic ease
         tl.to(playhead, {
             frame: nextSlideObj.frame,
             duration: tweenDuration,
-            ease: "power2.out", // High-fidelity cinematic ease
+            ease: "power1.inOut", // Smooth transition curve
             onUpdate: () => {
                 renderFrame(Math.round(playhead.frame));
             }
@@ -346,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (nextSlideObj.id === 'hero-section') {
             tl.to(nextSlideObj.el, { 
                 opacity: 1, 
-                duration: 0.4, 
+                duration: 0.3, 
                 ease: "power2.out", 
                 onStart: () => {
                     nextSlideObj.el.style.pointerEvents = 'auto';
@@ -357,13 +400,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const nextCard = nextSlideObj.el.querySelector('.card');
             if (nextCard) {
                 // Prime the starting state of the glass card for a smooth, short slide-up
-                gsap.set(nextCard, { opacity: 0, y: 20 });
+                gsap.set(nextCard, { opacity: 0, y: 15 });
                 gsap.set(nextSlideObj.el, { opacity: 1 });
                 
                 tl.to(nextCard, { 
                     opacity: 1, 
                     y: 0, 
-                    duration: 0.4, 
+                    duration: 0.3, 
                     ease: "power2.out",
                     onStart: () => {
                         nextSlideObj.el.classList.add('active');
@@ -379,15 +422,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Autoplay loop plays infinitely (resumes automatically after custom delays!)
-    function startAutoplay(delay = AUTOPLAY_DELAY) {
+    // Fallback autoplay loop (loops back to Slide 0!)
+    function startAutoplay() {
         stopAutoplay();
+        // Since playSlideShowcase handles transitions upon completion, this serves as a robust fallback
         autoplayTimer = setTimeout(() => {
             let nextIndex = (currentSlide + 1) % slides.length;
             goToSlide(nextIndex);
-        }, delay * 1000);
+        }, 6000);
     }
 
+    // Clear active autoplay fallback timers
     function stopAutoplay() {
         if (autoplayTimer) {
             clearTimeout(autoplayTimer);
@@ -415,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 slide.el.classList.remove('active');
                 const card = slide.el.querySelector('.card');
                 if (card) {
-                    gsap.set(card, { opacity: 0, y: 20 });
+                    gsap.set(card, { opacity: 0, y: 15 });
                 }
             }
         });
@@ -427,13 +472,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Start infinite autoplay loop
-        startAutoplay();
+        // Start showcase for Hero Landing section
+        playSlideShowcase(0, false);
     }
 
     // --- 5. Interactive Scroll & Touch Swipe Gestures ---
     let lastScrollTime = 0;
-    const SCROLL_COOLDOWN = 1000; // ms to debounce transitions for premium, non-jittery sweeps
+    const SCROLL_COOLDOWN = 800; // ms to debounce transitions for premium, non-jittery sweeps
 
     function handleScroll(delta) {
         if (isTransitioning) return;
@@ -445,7 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (delta > 0) {
             // Scroll down or right -> transition to the next slide (loops back infinitely!)
             let nextIndex = (currentSlide + 1) % slides.length;
-            goToSlide(nextIndex, true); // Treated as manual interaction (longer pause, then autoplay resumes!)
+            goToSlide(nextIndex, true); 
         } else if (delta < 0) {
             // Scroll up or left -> transition to the previous slide (loops back infinitely!)
             let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
@@ -485,7 +530,6 @@ document.addEventListener("DOMContentLoaded", () => {
             handleScroll(swipeDiff);
         }
     }, { passive: true });
-
 
     // Start loading images
     loadImages();

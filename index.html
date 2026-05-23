@@ -13,6 +13,18 @@
 </head>
 <body>
 
+    <!-- Fixed Brand Header -->
+    <header class="main-header">
+        <div class="logo">
+            <span class="logo-dot"></span>
+            <span class="logo-text">HomeFoods</span>
+        </div>
+        <div class="status-badge">
+            <span class="pulse-dot"></span>
+            <span class="status-text">Kurnool • Open on Swiggy</span>
+        </div>
+    </header>
+
     <!-- Preloader -->
     <div id="preloader" class="preloader">
         <div class="loader-content">
@@ -103,9 +115,18 @@
         </section>
     </div>
 
-    <!-- GSAP & ScrollTrigger -->
+    <!-- Slide Navigation Indicators -->
+    <div class="nav-indicators">
+        <button class="nav-dot active" data-slide="0" aria-label="Intro Screen"></button>
+        <button class="nav-dot" data-slide="1" aria-label="Flax Chapathi"></button>
+        <button class="nav-dot" data-slide="2" aria-label="Soft Idly"></button>
+        <button class="nav-dot" data-slide="3" aria-label="Crispy Dosa"></button>
+        <button class="nav-dot" data-slide="4" aria-label="Oats Smoothie"></button>
+        <button class="nav-dot" data-slide="5" aria-label="Combo Offer"></button>
+    </div>
+
+    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="./app.js"></script>
 </body>
 </html>

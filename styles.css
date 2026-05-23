@@ -1,11 +1,13 @@
 :root {
-    --primary-color: #2b1d1b;
-    --primary-light: #44302e;
+    --primary-color: #120b0a;
+    --primary-light: #221614;
     --text-light: #fdfbf7;
-    --glass-bg: rgba(30, 20, 18, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-bg: rgba(18, 12, 10, 0.68);
+    --glass-border: rgba(255, 255, 255, 0.09);
     --highlight: #f7d6c8;
-    --accent: #ffd166;
+    --accent: #ffca3a;
+    --accent-glow: rgba(255, 202, 58, 0.35);
+    --card-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -16,11 +18,12 @@
 }
 
 body {
-    background: linear-gradient(-45deg, #0e0a09, #251614, #1b0e0c, #351c19);
+    background: linear-gradient(-45deg, #0e0a09, #1b0e0c, #251614, #120b0a);
     background-size: 400% 400%;
     animation: gradientMesh 15s ease infinite;
     color: var(--text-light);
-    overflow-x: hidden;
+    height: 100vh;
+    overflow: hidden;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -28,6 +31,87 @@ body {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+
+/* Premium Brand Fixed Header */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    background: linear-gradient(to bottom, rgba(14, 10, 9, 0.8) 0%, rgba(14, 10, 9, 0) 100%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulseGlow 2s infinite;
+}
+
+.logo-text {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+    background: linear-gradient(135deg, #fff 40%, var(--highlight) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 14px;
+    border-radius: 30px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.pulse-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #38b000;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #38b000;
+    animation: statusPulse 1.5s infinite;
+}
+
+.status-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 10px var(--accent); }
+    50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 18px var(--accent); }
+}
+
+@keyframes statusPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.4); opacity: 1; }
 }
 
 /* Preloader */
@@ -91,23 +175,13 @@ body {
 }
 
 @keyframes preloaderPulse {
-    0%, 100% {
-        transform: scale(0.97);
-        opacity: 0.8;
-    }
-    50% {
-        transform: scale(1.03);
-        opacity: 1;
-    }
+    0%, 100% { transform: scale(0.97); opacity: 0.8; }
+    50% { transform: scale(1.03); opacity: 1; }
 }
 
 @keyframes preloaderBounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-8px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }
 
 /* Canvas Container */
@@ -118,7 +192,7 @@ body {
     width: 100vw;
     height: 100vh;
     z-index: 1;
-    pointer-events: none; /* Let clicks pass through to panels */
+    pointer-events: none;
 }
 
 canvas {
@@ -127,22 +201,29 @@ canvas {
     object-fit: cover;
 }
 
-/* Scroll Overlay Content */
+/* Scroll Overlay Content - Now stack slides absolutely */
 .scroll-content {
     position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
     z-index: 10;
 }
 
 .panel {
-    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100vh;
     display: flex;
     align-items: center;
     padding: 0 10%;
-    opacity: 0; /* Hidden by default, animated by GSAP */
+    opacity: 0;
+    pointer-events: none; /* Clicks bypass inactive slides */
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Alternate alignment */
 .panel:nth-child(odd) {
     justify-content: flex-start;
 }
@@ -155,39 +236,55 @@ canvas {
     justify-content: center !important;
 }
 
-/* Text Panel Wrapper (No Box Needed) */
+/* Elevated High-Fidelity Glassmorphism Card */
 .glass {
-    padding: 20px;
-    max-width: 500px;
-    /* Heavy text shadow to ensure readability against any background */
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 0 2px 5px rgba(0,0,0,0.6);
-    transform: translateY(30px);
-    transition: transform 0.4s ease;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 28px;
+    padding: 40px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: var(--card-shadow);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Slide Entrance Animations */
+.panel.active {
+    opacity: 1;
+    pointer-events: auto; /* Active cards are clickable */
 }
 
 .panel.active .glass {
     transform: translateY(0);
+    opacity: 1;
 }
 
 .card h2 {
-    font-size: 2.5rem;
+    font-size: 2.3rem;
     font-weight: 800;
-    margin-bottom: 15px;
-    line-height: 1.1;
-    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 60%, var(--highlight) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .card p {
-    font-size: 1.1rem;
-    font-weight: 300;
+    font-size: 1.05rem;
+    font-weight: 400;
     line-height: 1.6;
-    margin-bottom: 30px;
-    color: #e9ecef;
+    margin-bottom: 25px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* Health Benefits List */
 .health-benefits {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .health-benefits ul {
@@ -196,54 +293,76 @@ canvas {
 
 .health-benefits li {
     position: relative;
-    padding-left: 25px;
-    margin-bottom: 10px;
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--highlight);
+    padding-left: 28px;
+    margin-bottom: 12px;
+    font-size: 0.98rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    transition: all 0.3s ease;
+    cursor: default;
 }
 
 .health-benefits li::before {
     content: '✓';
     position: absolute;
-    left: 0;
+    left: 4px;
     color: var(--accent);
-    font-weight: bold;
+    font-weight: 900;
+    text-shadow: 0 0 8px rgba(255, 202, 58, 0.5);
+    transition: transform 0.3s ease;
 }
 
-/* Buttons */
+.health-benefits li:hover {
+    transform: translateX(6px);
+    color: #fff;
+}
+
+.health-benefits li:hover::before {
+    transform: scale(1.3) rotate(15deg);
+}
+
+/* Premium Buttons */
 .cta-button {
     display: inline-block;
-    background-color: var(--text-light);
+    background: linear-gradient(135deg, #fff 0%, #f4eae6 100%);
     color: var(--primary-color);
     text-decoration: none;
     padding: 16px 32px;
     border-radius: 50px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    text-align: center;
 }
 
 .cta-button:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
-    background-color: #fff;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(255, 255, 255, 0.12), 0 5px 15px rgba(0, 0, 0, 0.2);
+    background: #fff;
 }
 
-/* Finale & Hero Specifics */
+.cta-button:active {
+    transform: translateY(-1px) scale(0.99);
+}
+
+/* Hero Section */
 .hero-section {
-    position: fixed; /* So it stays in the center before scrolling */
+    position: absolute; /* Set to absolute inside scroll-content app shell */
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
     display: flex;
-    align-items: flex-start; /* Position at the top */
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding-top: 8vh; /* 8% viewport height from the top for top-middle positioning */
-    z-index: 15; /* Above canvas, below panels when scrolling */
+    z-index: 15;
     pointer-events: none;
+    padding-bottom: 6vh;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-content {
@@ -255,30 +374,31 @@ canvas {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 
 .welcome-text {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 300;
-    letter-spacing: 10px;
+    letter-spacing: 12px;
     text-transform: uppercase;
-    color: #e9ecef;
+    color: rgba(255, 255, 255, 0.7);
     opacity: 0;
     transform: translateY(30px);
-    animation: fadeUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .brand-title {
-    font-size: 5rem;
+    font-size: 5.5rem;
     font-weight: 800;
-    background: linear-gradient(90deg, #f7d6c8, #ffd166);
+    background: linear-gradient(135deg, #fff 20%, #f7d6c8 60%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     opacity: 0;
     transform: translateY(30px) rotateX(-20deg);
     transform-origin: center bottom;
-    animation: elegantPop 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.3s forwards;
+    animation: elegantPop 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
 }
 
 @keyframes fadeUp {
@@ -289,70 +409,154 @@ canvas {
     to { opacity: 1; transform: translateY(0) rotateX(0deg); }
 }
 
+/* Premium Floating Indicators Bar */
+.nav-indicators {
+    position: fixed;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 100;
+    background: rgba(18, 12, 10, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 10px 22px;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.nav-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.28);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.nav-dot::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-dot:hover {
+    background-color: rgba(255, 255, 255, 0.65);
+    transform: scale(1.2);
+}
+
+.nav-dot:focus {
+    outline: none;
+}
+
+.nav-dot.active {
+    background-color: var(--accent);
+    transform: scale(1.25);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+.nav-dot.active::after {
+    border-color: rgba(255, 202, 58, 0.35);
+    transform: scale(1.1);
+}
+
+/* Finale Card Upgrade */
 .combo-card {
     text-align: center;
-    max-width: 600px;
-    /* Finale can keep a slight dark background to emphasize the offer */
-    background: rgba(30, 20, 18, 0.85);
-    border: 1px solid rgba(255, 209, 102, 0.3);
-    border-radius: 24px;
-    padding: 40px;
+    max-width: 560px;
+    background: rgba(18, 12, 10, 0.88);
+    border: 1px solid rgba(255, 202, 58, 0.22);
+    border-radius: 32px;
+    padding: 50px 40px;
 }
 
 .combo-badge {
     display: inline-block;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, #ff9f1c 100%);
     color: #000;
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 8px 20px;
+    border-radius: 30px;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(255, 202, 58, 0.25);
 }
 
 .price-highlight {
-    font-size: 3.5rem;
+    font-size: 3.8rem;
     font-weight: 800;
     color: var(--accent);
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+    text-shadow: 0 0 20px rgba(255, 202, 58, 0.3);
 }
 
 .giant-cta {
-    font-size: 1.3rem;
-    padding: 20px 40px;
-    background-color: var(--accent);
+    font-size: 1.15rem;
+    padding: 18px 45px;
+    background: linear-gradient(135deg, var(--accent) 0%, #ff9f1c 100%);
     color: #000;
+    border: none;
+    font-weight: 800;
+    box-shadow: 0 6px 20px rgba(255, 202, 58, 0.3);
 }
 
 .giant-cta:hover {
-    background-color: #fff;
-    box-shadow: 0 8px 30px rgba(255, 209, 102, 0.4);
+    background: #fff;
+    box-shadow: 0 12px 35px rgba(255, 202, 58, 0.5);
+    color: #000;
 }
 
 .location-tag {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 0.88rem;
+    font-weight: 700;
     color: var(--highlight);
-    margin-top: 20px;
-    letter-spacing: 2px;
+    margin-top: 25px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    opacity: 0.95;
+    opacity: 0.85;
     animation: locationPulse 2s ease-in-out infinite;
 }
 
 @keyframes locationPulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.95; }
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+    .main-header {
+        padding: 18px 6%;
+    }
+    
+    .logo-text {
+        font-size: 1.25rem;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+    }
+
+    .status-text {
+        font-size: 0.75rem;
+    }
+
     .panel {
         padding: 0 5%;
-        align-items: flex-end; /* Push text to bottom on mobile so it doesn't overlay the main food image */
-        padding-bottom: 8vh;
+        align-items: flex-end;
+        padding-bottom: 12vh; /* Make room for navigation dots bar */
     }
     
     .panel:nth-child(odd), .panel:nth-child(even) {
@@ -360,80 +564,75 @@ canvas {
     }
 
     .glass {
-        padding: 20px 10px;
+        padding: 30px 24px;
         width: 100%;
-        text-align: center; /* Center aligning text on mobile for better balance */
+        max-width: 440px;
+        text-align: center;
+        border-radius: 24px;
     }
 
     .card h2 {
-        font-size: 1.8rem;
-        margin-bottom: 10px;
-        letter-spacing: -0.5px;
+        font-size: 1.85rem;
+        margin-bottom: 12px;
     }
 
     .card p {
         font-size: 0.95rem;
-        line-height: 1.5;
-        margin-bottom: 16px;
+        line-height: 1.55;
+        margin-bottom: 20px;
     }
 
     .health-benefits {
-        margin-bottom: 16px;
-        display: inline-block; /* Allows lists to center nicely inside centered text align */
-        text-align: left; /* Keeps checklist markers aligned beautifully */
+        margin-bottom: 20px;
+        display: inline-block;
+        text-align: left;
     }
 
     .health-benefits li {
-        font-size: 0.9rem;
-        margin-bottom: 6px;
+        font-size: 0.92rem;
+        margin-bottom: 8px;
     }
 
     .cta-button {
         display: block;
-        padding: 12px 24px;
+        padding: 14px 28px;
         font-size: 1rem;
-        width: 100%; /* Easy to tap full-width button on mobile */
-        text-align: center;
-    }
-
-    /* Combo Card Mobile Polishing */
-    .combo-card {
-        padding: 24px 16px;
-        border-radius: 20px;
         width: 100%;
     }
 
-    .combo-badge {
-        font-size: 0.8rem;
-        padding: 6px 12px;
-        margin-bottom: 12px;
+    .combo-card {
+        padding: 35px 24px;
     }
 
     .price-highlight {
-        font-size: 2.2rem;
-        margin-bottom: 20px;
+        font-size: 2.8rem;
     }
 
-    .giant-cta {
-        font-size: 1.1rem;
-        padding: 14px 28px;
-    }
-    
     canvas {
-        object-position: center 38%; /* Shift food image upwards on mobile so it sits cleanly above bottom text overlays */
+        object-position: center 38%;
     }
 
-    /* Hero Section Intro scaling for mobile */
     .hero-section {
-        padding-top: 12vh; /* Slightly lower from screen top on mobile to clear headers */
+        padding-bottom: 10vh;
     }
 
     .welcome-text {
-        font-size: 1.1rem;
-        letter-spacing: 6px;
+        font-size: 1.15rem;
+        letter-spacing: 8px;
     }
 
     .brand-title {
-        font-size: 2.8rem; /* Avoid text-wrapping / overflowing on narrow mobile devices */
+        font-size: 3.2rem;
+    }
+
+    .nav-indicators {
+        bottom: 25px;
+        gap: 12px;
+        padding: 8px 18px;
+    }
+
+    .nav-dot {
+        width: 10px;
+        height: 10px;
     }
 }

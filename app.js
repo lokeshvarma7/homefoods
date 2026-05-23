@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Calculate sequence length dynamically based on STEP
     const seqLen = Math.floor(expectedFramesCount / sequences.length);
 
+    // Declared early for resolution-independent high-DPI canvas resizing support
+    let lastRenderedFrame = -1;
+
+
 
     const percentageEl = document.getElementById('loading-percentage');
     const preloaderEl = document.getElementById('preloader');
@@ -35,12 +39,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("hero-canvas");
     const context = canvas.getContext("2d");
 
-    // Set canvas resolution (assuming 1280x720 optimized frames)
-    canvas.width = 1280;
-    canvas.height = 720;
-
     // --- 3. Progressive Loading Strategy ---
     let isAnimationInitialized = false;
+
+    // Dynamic High-DPI (Retina) Resolution Auto-Rescaler
+    function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Upscale canvas drawing buffer to match physical device pixels
+        // This delivers pin-sharp native-resolution rendering instead of blurry upscale interpolation!
+        canvas.width = Math.round(window.innerWidth * dpr);
+        canvas.height = Math.round(window.innerHeight * dpr);
+
+        // Instantly force redraw the current active frame at the high-DPI resolution
+        if (isAnimationInitialized && lastRenderedFrame !== -1) {
+            renderFrame(lastRenderedFrame, true);
+        }
+    }
+
+    // Initialize high-DPI sizing and listen for resize events
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
 
     function pad(num, size) {
         let s = num + "";
@@ -185,9 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return -1;
     }
 
-    let lastRenderedFrame = -1;
     let lastRenderTime = 0;
     const RENDER_INTERVAL = 16; // Caps drawing to exactly 60 FPS to match screen refresh perfectly
+
 
     function renderFrame(index, force = false) {
         const now = performance.now();
@@ -274,12 +294,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentSlide = index;
                 isTransitioning = false;
 
-                // Restart autoplay loop (manual clicks pause/stop autoplay to let user inspect!)
-                if (!manual) {
-                    startAutoplay();
-                }
+                // Always resume autoplay dynamically! Manual interactions hold for 3.5s, autoplay for 2.0s.
+                startAutoplay(manual ? 3.5 : AUTOPLAY_DELAY);
             }
         });
+
 
         // 1. Instantly fade out the current active card elements
         if (currentSlideObj.id === 'hero-section') {
@@ -360,13 +379,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Autoplay loop plays infinitely (loops back to Slide 0!)
-    function startAutoplay() {
+    // Autoplay loop plays infinitely (resumes automatically after custom delays!)
+    function startAutoplay(delay = AUTOPLAY_DELAY) {
         stopAutoplay();
         autoplayTimer = setTimeout(() => {
             let nextIndex = (currentSlide + 1) % slides.length;
             goToSlide(nextIndex);
-        }, AUTOPLAY_DELAY * 1000);
+        }, delay * 1000);
     }
 
     function stopAutoplay() {
@@ -416,47 +435,57 @@ document.addEventListener("DOMContentLoaded", () => {
     let lastScrollTime = 0;
     const SCROLL_COOLDOWN = 1000; // ms to debounce transitions for premium, non-jittery sweeps
 
-    function handleScroll(deltaY) {
+    function handleScroll(delta) {
         if (isTransitioning) return;
 
         const now = performance.now();
         if (now - lastScrollTime < SCROLL_COOLDOWN) return;
         lastScrollTime = now;
 
-        if (deltaY > 0) {
-            // Scroll down -> transition to the next slide (loops back infinitely!)
+        if (delta > 0) {
+            // Scroll down or right -> transition to the next slide (loops back infinitely!)
             let nextIndex = (currentSlide + 1) % slides.length;
-            goToSlide(nextIndex, true); // Treated as manual interaction to pause autoplay and let user read
-        } else if (deltaY < 0) {
-            // Scroll up -> transition to the previous slide (loops back infinitely!)
+            goToSlide(nextIndex, true); // Treated as manual interaction (longer pause, then autoplay resumes!)
+        } else if (delta < 0) {
+            // Scroll up or left -> transition to the previous slide (loops back infinitely!)
             let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
             goToSlide(prevIndex, true);
         }
     }
 
-    // Custom mouse wheel listener (interfacing cleanly with trackpads & scroll wheels)
+    // Custom mouse wheel listener (supports vertical and horizontal trackpad/wheel scrolls!)
     window.addEventListener("wheel", (e) => {
-        if (Math.abs(e.deltaY) > 5) {
-            handleScroll(e.deltaY);
+        // Choose the dominant scroll direction
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (Math.abs(delta) > 5) {
+            handleScroll(delta);
         }
     }, { passive: true });
 
-    // Custom touch swipe listener for buttery-smooth mobile/tablet scroll navigation
+    // Custom touch swipe listener for vertical and horizontal mobile swiping
+    let touchStartX = 0;
     let touchStartY = 0;
 
     window.addEventListener("touchstart", (e) => {
+        touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
     }, { passive: true });
 
     window.addEventListener("touchend", (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
         const touchEndY = e.changedTouches[0].clientY;
+        const diffX = touchStartX - touchEndX;
         const diffY = touchStartY - touchEndY;
 
+        // Choose the dominant swipe direction
+        const swipeDiff = Math.abs(diffX) > Math.abs(diffY) ? diffX : diffY;
+
         // Enforce a minimum 40px swipe threshold to confirm intentional swipe navigation
-        if (Math.abs(diffY) > 40) {
-            handleScroll(diffY);
+        if (Math.abs(swipeDiff) > 40) {
+            handleScroll(swipeDiff);
         }
     }, { passive: true });
+
 
     // Start loading images
     loadImages();

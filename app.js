@@ -412,6 +412,51 @@ document.addEventListener("DOMContentLoaded", () => {
         startAutoplay();
     }
 
+    // --- 5. Interactive Scroll & Touch Swipe Gestures ---
+    let lastScrollTime = 0;
+    const SCROLL_COOLDOWN = 1000; // ms to debounce transitions for premium, non-jittery sweeps
+
+    function handleScroll(deltaY) {
+        if (isTransitioning) return;
+
+        const now = performance.now();
+        if (now - lastScrollTime < SCROLL_COOLDOWN) return;
+        lastScrollTime = now;
+
+        if (deltaY > 0) {
+            // Scroll down -> transition to the next slide (loops back infinitely!)
+            let nextIndex = (currentSlide + 1) % slides.length;
+            goToSlide(nextIndex, true); // Treated as manual interaction to pause autoplay and let user read
+        } else if (deltaY < 0) {
+            // Scroll up -> transition to the previous slide (loops back infinitely!)
+            let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            goToSlide(prevIndex, true);
+        }
+    }
+
+    // Custom mouse wheel listener (interfacing cleanly with trackpads & scroll wheels)
+    window.addEventListener("wheel", (e) => {
+        if (Math.abs(e.deltaY) > 5) {
+            handleScroll(e.deltaY);
+        }
+    }, { passive: true });
+
+    // Custom touch swipe listener for buttery-smooth mobile/tablet scroll navigation
+    let touchStartY = 0;
+
+    window.addEventListener("touchstart", (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener("touchend", (e) => {
+        const touchEndY = e.changedTouches[0].clientY;
+        const diffY = touchStartY - touchEndY;
+
+        // Enforce a minimum 40px swipe threshold to confirm intentional swipe navigation
+        if (Math.abs(diffY) > 40) {
+            handleScroll(diffY);
+        }
+    }, { passive: true });
 
     // Start loading images
     loadImages();

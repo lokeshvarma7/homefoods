@@ -1,46 +1,7 @@
 // Wait for DOM to load
 document.addEventListener("DOMContentLoaded", () => {
-    // --- 1. Stitch Text Character Splitter Utility ---
-    function prepareStitchText() {
-        const textElements = document.querySelectorAll('.panel h2, .panel p');
-        textElements.forEach(el => {
-            const words = el.innerText.split(' ');
-            el.innerHTML = '';
-            
-            words.forEach((word, wordIdx) => {
-                const wordSpan = document.createElement('span');
-                wordSpan.style.display = 'inline-block';
-                wordSpan.style.whiteSpace = 'nowrap';
-                
-                const chars = word.split('');
-                chars.forEach(char => {
-                    const charSpan = document.createElement('span');
-                    charSpan.style.display = 'inline-block';
-                    charSpan.style.opacity = '0';
-                    charSpan.style.transform = 'translateY(12px)';
-                    charSpan.classList.add('stitch-char');
-                    charSpan.innerText = char;
-                    wordSpan.appendChild(charSpan);
-                });
-                
-                el.appendChild(wordSpan);
-                
-                // Add space after word (except last word)
-                if (wordIdx < words.length - 1) {
-                    const space = document.createElement('span');
-                    space.innerHTML = '&nbsp;';
-                    el.appendChild(space);
-                }
-            });
-        });
-    }
-
-    // Split text into animate-ready stagger characters instantly
-    prepareStitchText();
-
-    // --- 2. Configuration & Undersampling Strategy ---
+    // --- 1. Configuration & Undersampling Strategy ---
     const TOTAL_FRAMES = 192;
-
     const STEP = 2; // Load every 2nd frame for highly detailed, complete animations (96 frames per sequence)
     
     // The 4 sequence directories and their file naming conventions
@@ -440,53 +401,20 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             const nextCard = nextSlideObj.el.querySelector('.card');
             if (nextCard) {
-                // Ensure starting state is visible, but text elements are animated individually
-                gsap.set(nextCard, { opacity: 1 });
+                // Prime the starting state of the glass card for a smooth, short slide-up
+                gsap.set(nextCard, { opacity: 0, y: 15 });
                 gsap.set(nextSlideObj.el, { opacity: 1 });
                 
-                const chars = nextCard.querySelectorAll('.stitch-char');
-                const ctaBtn = nextCard.querySelector('.cta-button');
-
-                if (chars.length > 0) {
-                    // Reset all characters to start state
-                    gsap.set(chars, { opacity: 0, y: 12 });
-                    
-                    // Stitch animation: Stagger character fade-in and slide-up!
-                    tl.to(chars, {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.4,
-                        stagger: 0.012, // Gorgeous 12ms stagger per letter!
-                        ease: "power2.out",
-                        onStart: () => {
-                            nextSlideObj.el.classList.add('active');
-                        }
-                    }, fadeStartOffset);
-                } else {
-                    // Fallback if split-text is not supported
-                    tl.to(nextCard, { 
-                        opacity: 1, 
-                        y: 0, 
-                        duration: 0.3, 
-                        ease: "power2.out",
-                        onStart: () => {
-                            nextSlideObj.el.classList.add('active');
-                        }
-                    }, fadeStartOffset);
-                }
-
-                // Smoothly fade in the Swiggy order text link at the end of the text stitch reveal
-                if (ctaBtn) {
-                    gsap.set(ctaBtn, { opacity: 0, y: 5 });
-                    tl.to(ctaBtn, {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.35,
-                        ease: "power2.out"
-                    }, "-=0.15");
-                }
+                tl.to(nextCard, { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.3, 
+                    ease: "power2.out",
+                    onStart: () => {
+                        nextSlideObj.el.classList.add('active');
+                    }
+                }, fadeStartOffset);
             }
-
         }
 
         // 4. Highlight navigation dot early for instant feedback

@@ -245,9 +245,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 context.drawImage(img, bgOffsetX, bgOffsetY, Math.round(bgWidth), Math.round(bgHeight));
                 context.restore();
 
-                // 2. Draw the sharp, fully zoomed-out foreground centered in the viewport
-                // Fitted to mobile screen width with a tiny premium border safety margin
-                let fgWidth = canvas.width * 1.05;
+                // 2. Draw the sharp, beautifully balanced foreground centered in the viewport
+                // Scaled to 1.4x of the width for an immersive close-up that fits mobile perfectly
+                let fgWidth = canvas.width * 1.4;
                 let fgHeight = fgWidth / imgRatio;
                 
                 let fgOffsetX = Math.round((canvas.width - fgWidth) / 2);
